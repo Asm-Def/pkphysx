@@ -10,7 +10,7 @@ import meshcat
 import meshcat.geometry as g
 import trimesh.exchange.obj
 
-from pyphysx import ShapeFlag, GeometryType
+from pkphysx import ShapeFlag, GeometryType
 from pyphysx_render.render_base import ViewerBase
 from pyphysx_utils.transformations import multiply_transformations, pose_to_transformation_matrix
 

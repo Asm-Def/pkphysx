@@ -16,7 +16,7 @@ from pyrender import Node
 
 from pyphysx_render.pyrender_trackball import RoboticTrackball
 from pyphysx_render.render_base import ViewerBase
-from pyphysx import ShapeFlag, Shape, RigidActor, GeometryType
+from pkphysx import ShapeFlag, Shape, RigidActor, GeometryType
 
 from pyphysx_render.utils import gl_color_from_matplotlib
 from pyphysx_utils.transformations import multiply_transformations, pose_to_transformation_matrix

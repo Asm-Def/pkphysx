@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(pyphysx)
+project(pkphysx)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -25,12 +25,23 @@ find_package(codecov)
 
 include_directories(include)
 
-pybind11_add_module(pyphysx MODULE NO_EXTRAS src/pyphysx.cpp)
-target_link_libraries(pyphysx PUBLIC ${CONAN_LIBS})
-add_custom_command(TARGET pyphysx POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:pyphysx> ${PHYSX_LIBRARY_OUTPUT_DIRECTORY}/$<TARGET_FILE_NAME:pyphysx>
+pybind11_add_module(pkphysx MODULE NO_EXTRAS src/pyphysx.cpp)
+target_link_libraries(pkphysx PUBLIC ${CONAN_LIBS})
+add_custom_command(TARGET pkphysx POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:pkphysx> ${PHYSX_LIBRARY_OUTPUT_DIRECTORY}/$<TARGET_FILE_NAME:pkphysx>
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/tests ${CMAKE_BINARY_DIR}/tests
         )
-add_coverage(pyphysx)
+add_coverage(pkphysx)
 
 coverage_evaluate()
+
+
+# Copy to source directory
+# https://stackoverflow.com/questions/57464766/copy-compile-commands-json-to-project-root-folder
+message("Copying compile_commands.json to ${CMAKE_SOURCE_DIR}")
+add_custom_target(
+    copy-compile-commands ALL
+    ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}
+    )

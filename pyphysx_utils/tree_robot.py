@@ -22,7 +22,7 @@ import quaternion as npq
 import anytree
 
 from pyphysx_utils.transformations import multiply_transformations, inverse_transform, unit_pose, quat_from_euler
-from pyphysx import *
+from pkphysx import *
 
 
 class KinematicPhysXJoint:

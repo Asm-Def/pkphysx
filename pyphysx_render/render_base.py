@@ -7,7 +7,7 @@
 from abc import abstractmethod
 from typing import List
 
-from pyphysx import ShapeFlag, Shape
+from pkphysx import ShapeFlag, Shape
 from pyphysx_render.utils import gl_color_from_matplotlib
 
 

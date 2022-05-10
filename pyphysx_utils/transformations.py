@@ -4,7 +4,7 @@
 # Created on: 5/15/20
 #     Author: Vladimir Petrik <vladimir.petrik@cvut.cz>
 
-from pyphysx import cast_transformation
+from pkphysx import cast_transformation
 import quaternion as npq
 import numpy as np
 

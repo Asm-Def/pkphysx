@@ -57,22 +57,24 @@ class CMakeBuild(build_ext):
 
         if env.get('PYPHYSX_COV'):
             cmake_args += ['-DENABLE_COVERAGE=On']
+        
+        cmake_args += ['-DCMAKE_EXPORT_COMPILE_COMMANDS=On']
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.', '--target', 'pyphysx'] + build_args, cwd=self.build_temp)
+        subprocess.check_call(['cmake', '--build', '.', '--target', 'pkphysx', '--target', 'copy-compile-commands'] + build_args, cwd=self.build_temp)
 
 
 setup(
-    name='pyphysx',
-    version='0.2.4',
-    author='Vladimir Petrik',
-    author_email='vladimir.petrik@cvut.cz',
-    description='PyPhysX - python wrapper for PhysX Nvidia simulator.',
+    name='pkphysx',
+    version='0.0.1',
+    author='Jiaxin Wu, Vladimir Petrik',
+    author_email='willywu@foxmail.com, vladimir.petrik@cvut.cz',
+    description='PkPhysX - pyphysx fork for parking arrangement',
     long_description='',
-    ext_modules=[CMakeExtension('pyphysx')],
+    ext_modules=[CMakeExtension('pkphysx')],
     cmdclass=dict(build_ext=CMakeBuild),
     install_requires=['conan', 'numpy', 'imageio', 'imageio_ffmpeg', 'trimesh', 'networkx',
                       'numba', 'numpy_quaternion', 'matplotlib', 'scipy', 'anytree', 'pyrender', 'meshcat',

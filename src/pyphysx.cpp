@@ -20,7 +20,7 @@
 namespace py = pybind11;
 using py::arg;
 
-PYBIND11_MODULE(pyphysx, m) {
+PYBIND11_MODULE(pkphysx, m) {
 
     /***
      * Define enumerations.
@@ -173,7 +173,7 @@ PYBIND11_MODULE(pyphysx, m) {
             )
             .def("__repr__",
                  [](const Material &m) {
-                     return "<pyphysx.Material ("
+                     return "<pkphysx.Material ("
                             + std::to_string(m.get_static_friction()) + ", "
                             + std::to_string(m.get_dynamic_friction()) + ", "
                             + std::to_string(m.get_restitution()) + ") >";

@@ -12,7 +12,8 @@ from pyphysx_render.pyrender import PyPhysxViewer
 
 actor = RigidDynamic()
 mesh_mat = Material()
-obj: trimesh.Scene = trimesh.load('spade.obj', split_object=True, group_material=False)
+from examples.common import local_file
+obj: trimesh.Scene = trimesh.load(local_file('spade.obj'), split_object=True, group_material=False)
 for g in obj.geometry.values():
     actor.attach_shape(Shape.create_convex_mesh_from_points(g.vertices, mesh_mat, scale=1e-3))
 actor.set_global_pose([0.5, 0.5, 1.0])
@@ -33,7 +34,7 @@ scene = Scene()
 scene.add_actor(RigidStatic.create_plane(material=Material(static_friction=0.1, dynamic_friction=0.1, restitution=0.5)))
 scene.add_actor(actor)
 
-render = PyPhysxViewer(video_filename='videos/02_spade.gif')
+render = PyPhysxViewer(video_filename=local_file('videos/02_spade.gif'))
 render.add_physx_scene(scene)
 
 rate = Rate(240)

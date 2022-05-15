@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('06_performance.csv')
+from examples.common import local_file
+df = pd.read_csv(local_file('06_performance.csv'))
 
 fig, axes = plt.subplots(2, 8, squeeze=False, sharex=True, sharey=False, figsize=(6.4 * 3., 4.8 * 1.5))
 for (obj_type, obj_grp), axrow in zip(df.groupby('obj_type'), axes):
@@ -21,7 +22,7 @@ for (obj_type, obj_grp), axrow in zip(df.groupby('obj_type'), axes):
             if gname < 0.5:  # CPU
                 ax.bar(ind - width / 2, ctime, width=width, color='tab:blue', label='No GPU')
             else:  # GPU
-                ax.bar(ind + width / 2, ctime, width=width, color='tab:orange', label='GPU V100')
+                ax.bar(ind + width / 2, ctime, width=width, color='tab:orange', label='GPU RTX2080Ti')
             ax.set_xticks(ind)
             ax.set_xticklabels([str(int(v)) for v in indv])
         ax.set_title('{} x {}'.format(int(num_objects), obj_type))
@@ -38,5 +39,5 @@ fig.delaxes(axes[0, -2])
 fig.subplots_adjust(left=0.03, wspace=0.25)
 fig.subplots_adjust(right=0.99)
 
-fig.savefig('06_gpu_performance.png')
+fig.savefig(local_file('06_gpu_performance.png'))
 plt.show()

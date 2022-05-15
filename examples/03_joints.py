@@ -42,7 +42,8 @@ j3 = D6Joint(actors_bottom[2], actors_upper[2], local_pose0=[0., 0., 0.5])
 j3.set_motion(D6Axis.Z, D6Motion.FREE)  # unlock z axis linear motion
 j3.set_drive(D6Drive.Z, stiffness=0., damping=100., force_limit=100)  # add drive with damping
 
-render = PyPhysxViewer(video_filename='videos/03_joints.gif')
+from examples.common import local_file
+render = PyPhysxViewer(video_filename=local_file('videos/03_joints.gif'))
 render.add_physx_scene(scene)
 rate = Rate(25)
 while render.is_active:

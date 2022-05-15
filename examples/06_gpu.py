@@ -15,6 +15,8 @@ import time
 import trimesh
 
 
+from examples.common import local_file
+from pyphysx_render.pyrender import PyPhysxViewer
 def do_sim(i, return_dict, prop):
     """ Perform simulation in separate process. That ensures that the physics is initialized for each set of
     properties. There is always just one Physics for the process. """
@@ -24,9 +26,9 @@ def do_sim(i, return_dict, prop):
     scene = Scene() if not prop['gpu'] else Scene(
         scene_flags=[SceneFlag.ENABLE_PCM, SceneFlag.ENABLE_GPU_DYNAMICS, SceneFlag.ENABLE_STABILIZATION],
         broad_phase_type=BroadPhaseType.GPU,
-        gpu_max_num_partitions=8, gpu_dynamic_allocation_scale=8.,
+        gpu_max_num_partitions=32, gpu_dynamic_allocation_scale=16.,
     )
-    obj: trimesh.Scene = trimesh.load('spade.obj', split_object=True, group_material=False)
+    obj: trimesh.Scene = trimesh.load(local_file('spade.obj'), split_object=True, group_material=False)
     mat = Material(static_friction=0.1, dynamic_friction=0.1, restitution=0.5)
     scene.add_actor(RigidStatic.create_plane(material=mat))
     for _ in range(prop['num_objects']):
@@ -40,10 +42,14 @@ def do_sim(i, return_dict, prop):
         o.set_mass(1.)
         scene.add_actor(o)
 
+    # render = PyPhysxViewer()
+    # render.add_physx_scene(scene)
     start_time = time.time()
     rate = Rate(240)
     for _ in range(1000):
         scene.simulate(rate.period())
+        # render.update()
+        # rate.sleep()
     end_time = time.time()
     return_dict[i] = end_time - start_time
 
@@ -57,7 +63,8 @@ dicts = {
     'obj_type': ['sphere', 'spade'],
     'num_objects': [1, 10, 100, 1000, 5000, 10000, 25000, 50000],
     'gpu': [True, False],
-    'num_cpus': [16, 8, 4, 2, 1, 0],
+    #'num_cpus': [16, 8, 4, 2, 1, 0],
+    'num_cpus': [15, 7, 3, 1, 0],
 }
 
 properties = list(dict(zip(dicts, x)) for x in itertools.product(*dicts.values()))
@@ -71,5 +78,5 @@ for i, prop in enumerate(properties):
     p.start()
     p.join()
     performance = performance.append({**prop, **{'computation_time': return_dict[i]}}, ignore_index=True)
-    performance.to_csv('06_performance.csv')
+    performance.to_csv(local_file('06_performance.csv'))
     print('Computation time: ', return_dict[i])

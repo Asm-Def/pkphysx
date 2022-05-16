@@ -11,6 +11,7 @@
 #define SIM_PHYSX_PHYSICS_H
 
 #include <PxPhysicsAPI.h>
+#include <Config.h>
 
 class Physics {
 
@@ -63,8 +64,8 @@ private:
     Physics() {
         using namespace physx;
         foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator, error_callback);
-        physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, PxTolerancesScale());
-        auto params = PxCookingParams(PxTolerancesScale());
+        physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, pkphysx::tolerances_scale);
+        auto params = PxCookingParams(pkphysx::tolerances_scale);
         params.buildGPUData = true;
         cooking = PxCreateCooking(PX_PHYSICS_VERSION, *foundation, params);
         dispatcher = physx::PxDefaultCpuDispatcherCreate(0);

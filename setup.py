@@ -66,6 +66,10 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', '--target', 'pkphysx', '--target', 'copy-compile-commands'] + build_args, cwd=self.build_temp)
 
+class CMakeDebugBuild(CMakeBuild):
+    def run(self):
+        self.debug = True
+        CMakeBuild.run(self)
 
 setup(
     name='pkphysx',
@@ -75,7 +79,10 @@ setup(
     description='PkPhysX - pyphysx fork for parking arrangement',
     long_description='',
     ext_modules=[CMakeExtension('pkphysx')],
-    cmdclass=dict(build_ext=CMakeBuild),
+    cmdclass={
+        # "build_ext": CMakeDebugBuild,
+        "build_ext": CMakeBuild,
+    },
     install_requires=['conan', 'numpy', 'imageio', 'imageio_ffmpeg', 'trimesh', 'networkx',
                       'numba', 'numpy_quaternion', 'matplotlib', 'scipy', 'anytree', 'pyrender', 'meshcat',
                       'pycollada'],

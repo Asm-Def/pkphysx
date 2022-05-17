@@ -210,6 +210,13 @@ PYBIND11_MODULE(pkphysx, m) {
                         arg("quantized_count") = 255,
                         arg("vertex_limit") = 255
             )
+            .def_static("create_triangle_mesh", &Shape::create_triangle_mesh,
+                        arg("vertices"),
+                        arg("indices"),
+                        arg("material"),
+                        arg("is_exclusive") = true,
+                        arg("scale") = 1.
+            )
             .def("get_shape_data", &Shape::get_shape_data)
             .def("set_local_pose", &Shape::set_local_pose,
                  arg("pose") = physx::PxTransform(physx::PxIdentity)

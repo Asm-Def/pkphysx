@@ -63,6 +63,8 @@ public:
             return render_sphere_geometry(12, 12);
         } else if (get_physx_ptr()->getGeometryType() == physx::PxGeometryType::eCONVEXMESH) {
             return render_convex_geometry();
+        } else if (get_physx_ptr()->getGeometryType() == physx::PxGeometryType::eTRIANGLEMESH) {
+            return render_triangle_geometry();
         }
         return Eigen::MatrixXf(0, 0);
     }
@@ -142,11 +144,57 @@ public:
         return Shape::from_geometry(geom, mat, is_exclusive);
     }
 
+    static Shape create_triangle_mesh(const Eigen::MatrixXf &vertices, const Eigen::MatrixXi &faces, Material mat, bool is_exclusive, physx::PxReal scale) {
+        using namespace physx;
+        std::vector<PxVec3> px_vertices(vertices.rows());
+        for (size_t i = 0; i < vertices.rows(); ++i) {
+            px_vertices[i] = PxVec3(vertices(i, 0), vertices(i, 1), vertices(i, 2));
+        }
+
+        PxTriangleMeshDesc meshDesc;
+        meshDesc.points.count = px_vertices.size();
+        meshDesc.points.stride = sizeof(PxVec3);
+        meshDesc.points.data = &px_vertices[0];
+
+        meshDesc.triangles.count = faces.rows();
+        bool use16 = (faces.rows() * 3 <= 0xffff);
+        if (use16){
+            std::vector<PxU16> px_faces(faces.rows() * 3);
+            for (size_t i = 0; i < faces.rows(); ++i) {
+                px_faces[i * 3] = faces(i, 0);
+                px_faces[i * 3 + 1] = faces(i, 1);
+                px_faces[i * 3 + 2] = faces(i, 2);
+            }
+            meshDesc.triangles.stride = sizeof(PxU16) * 3;
+            meshDesc.triangles.data = &px_faces[0];
+            meshDesc.flags |= PxMeshFlag::e16_BIT_INDICES;
+        }
+        else{
+            std::vector<PxU32> px_faces(faces.rows() * 3);
+            for (size_t i = 0; i < faces.rows(); ++i) {
+                px_faces[i * 3] = faces(i, 0);
+                px_faces[i * 3 + 1] = faces(i, 1);
+                px_faces[i * 3 + 2] = faces(i, 2);
+            }
+            meshDesc.triangles.stride = 3 * sizeof(PxU32);
+            meshDesc.triangles.data = &px_faces[0];
+            meshDesc.flags &= ~PxMeshFlag::e16_BIT_INDICES;
+        }
+
+        PxDefaultMemoryOutputStream buf;
+        PxTriangleMeshCookingResult::Enum result;
+        if (!Physics::get().cooking->cookTriangleMesh(meshDesc, buf, &result)) {
+            std::cout << "Cannot cook triangle mesh. Returning unit sphere instead. " << std::endl;
+            return Shape::from_geometry(PxSphereGeometry(1.), mat, is_exclusive);
+        }
+        PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+        auto geom = PxTriangleMeshGeometry(Physics::get_physics()->createTriangleMesh(input), PxMeshScale(scale), PxMeshGeometryFlag::eDOUBLE_SIDED);
+        return Shape::from_geometry(geom, mat, is_exclusive);
+    }
+
 private:
-    static Shape from_geometry(const physx::PxGeometry &geometry, Material mat, bool is_exclusive) {
-        return Shape(Physics::get_physics()->createShape(geometry, *mat.get_physx_ptr(), is_exclusive,
-                                                         physx::PxShapeFlag::eSIMULATION_SHAPE |
-                                                         physx::PxShapeFlag::eVISUALIZATION));
+    static Shape from_geometry(const physx::PxGeometry &geometry, Material mat, bool is_exclusive, physx::PxShapeFlags shape_flags=physx::PxShapeFlag::eSIMULATION_SHAPE | physx::PxShapeFlag::eVISUALIZATION) {
+        return Shape(Physics::get_physics()->createShape(geometry, *mat.get_physx_ptr(), is_exclusive, shape_flags));
     }
 
 
@@ -241,6 +289,43 @@ private:
         return data;
     }
 
+    /** SnippetRender from PhysX. */
+    Eigen::MatrixXf render_triangle_geometry() const {
+        using namespace physx;
+        PxTriangleMeshGeometry geom;
+        get_physx_ptr()->getTriangleMeshGeometry(geom);
+
+        PxTriangleMesh *mesh = geom.triangleMesh;
+        const PxU32 nbPolys = mesh->getNbTriangles();
+        const PxU32 has16BitIndices = mesh->getTriangleMeshFlags() & PxTriangleMeshFlag::e16_BIT_INDICES;
+        const void *indices = mesh->getTriangles();
+
+        const PxVec3 *verts = mesh->getVertices();
+
+        const PxU32 *indices32 = reinterpret_cast<const PxU32 *>(indices);
+        const PxU16 *indices16 = reinterpret_cast<const PxU16 *>(indices);
+
+        const PxVec3 &scale = geom.scale.scale;
+        Eigen::MatrixXf data(nbPolys, 3 * 3);
+        for (PxU32 i = 0; i < nbPolys; i++) {
+            PxVec3 triVert[3];
+            if (has16BitIndices){
+                triVert[0] = verts[indices16[i * 3 + 0]];
+                triVert[1] = verts[indices16[i * 3 + 1]];
+                triVert[2] = verts[indices16[i * 3 + 2]];
+            }
+            else
+            {
+                triVert[0] = verts[indices32[i * 3 + 0]];
+                triVert[1] = verts[indices32[i * 3 + 1]];
+                triVert[2] = verts[indices32[i * 3 + 2]];
+            }
+            data.row(i) << scale.x * triVert[0].x, scale.y * triVert[0].y, scale.z * triVert[0].z,
+                    scale.x * triVert[1].x, scale.y * triVert[1].y, scale.z * triVert[1].z,
+                    scale.x * triVert[2].x, scale.y * triVert[2].y, scale.z * triVert[2].z;
+        }
+        return data;
+    }
 };
 
 #endif //PYPHYSX_SHAPE_H

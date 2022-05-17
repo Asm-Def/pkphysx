@@ -136,6 +136,10 @@ class PyRenderBase(ViewerBase):
             clr = [0.8] * 3 + [0.1] if clr_string is None else gl_color_from_matplotlib(clr_string, return_rgba=True)
             primitive = Primitive(positions=self._grid_lines(), normals=None, color_0=clr, mode=GLTF.LINES, poses=None)
             return Mesh(primitives=[primitive])
+        elif shape.get_geometry_type() == GeometryType.TRIANGLEMESH:
+            data = shape.get_shape_data()
+            primitive = Primitive(data.reshape(-1, 3), normals=None, color_0=clr, mode=GLTF.TRIANGLES, poses=None)
+            return Mesh(primitives=[primitive])
         else:
             raise NotImplementedError('Not supported type of the geometry.')
 

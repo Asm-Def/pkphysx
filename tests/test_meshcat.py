@@ -15,7 +15,7 @@ import meshcat.geometry as g
 
 sys.path.append('lib')
 
-from pyphysx import *
+from pkphysx import *
 
 
 class MeschatTest(unittest.TestCase):

@@ -26,7 +26,7 @@ find_package(codecov)
 include_directories(include)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
-pybind11_add_module(pkphysx MODULE NO_EXTRAS src/pyphysx.cpp)
+pybind11_add_module(pkphysx MODULE NO_EXTRAS src/pkphysx.cpp)
 target_link_libraries(pkphysx PUBLIC ${CONAN_LIBS})
 add_custom_command(TARGET pkphysx POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:pkphysx> ${PHYSX_LIBRARY_OUTPUT_DIRECTORY}/$<TARGET_FILE_NAME:pkphysx>
@@ -35,7 +35,6 @@ add_custom_command(TARGET pkphysx POST_BUILD
 add_coverage(pkphysx)
 
 coverage_evaluate()
-
 
 # Copy to source directory
 # https://stackoverflow.com/questions/57464766/copy-compile-commands-json-to-project-root-folder

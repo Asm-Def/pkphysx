@@ -81,7 +81,7 @@ setup(
     ext_modules=[CMakeExtension('pkphysx')],
     cmdclass={
         # "build_ext": CMakeDebugBuild,
-        "build_ext": CMakeBuild,
+        "build_ext": CMakeDebugBuild if os.environ.get('PYMODE','') == 'debug' else CMakeBuild,
     },
     install_requires=['conan', 'numpy', 'imageio', 'imageio_ffmpeg', 'trimesh', 'networkx',
                       'numba', 'numpy_quaternion', 'matplotlib', 'scipy', 'anytree', 'pyrender', 'meshcat',

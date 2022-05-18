@@ -4,7 +4,7 @@
 # Created on: 5/4/20
 #     Author: Vladimir Petrik <vladimir.petrik@cvut.cz>
 
-from pyphysx import *
+from pkphysx import *
 from pyphysx_utils.rate import Rate
 from pyphysx_render.pyrender import PyPhysxViewer
 

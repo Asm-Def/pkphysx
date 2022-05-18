@@ -155,22 +155,22 @@ public:
         meshDesc.points.count = px_vertices.size();
         meshDesc.points.stride = sizeof(PxVec3);
         meshDesc.points.data = &px_vertices[0];
-
         meshDesc.triangles.count = faces.rows();
-        bool use16 = (faces.rows() * 3 <= 0xffff);
-        if (use16){
-            std::vector<PxU16> px_faces(faces.rows() * 3);
-            for (size_t i = 0; i < faces.rows(); ++i) {
-                px_faces[i * 3] = faces(i, 0);
-                px_faces[i * 3 + 1] = faces(i, 1);
-                px_faces[i * 3 + 2] = faces(i, 2);
-            }
-            meshDesc.triangles.stride = sizeof(PxU16) * 3;
-            meshDesc.triangles.data = &px_faces[0];
-            meshDesc.flags |= PxMeshFlag::e16_BIT_INDICES;
-        }
-        else{
-            std::vector<PxU32> px_faces(faces.rows() * 3);
+        std::vector<PxU32> px_faces(faces.rows() * 3);
+        // bool use16 = (faces.rows() * 3 <= 0xffff);
+        // if (use16){
+        //     std::vector<PxU16> px_faces(faces.rows() * 3);
+        //     for (size_t i = 0; i < faces.rows(); ++i) {
+        //         px_faces[i * 3] = faces(i, 0);
+        //         px_faces[i * 3 + 1] = faces(i, 1);
+        //         px_faces[i * 3 + 2] = faces(i, 2);
+        //     }
+        //     meshDesc.triangles.stride = sizeof(PxU16) * 3;
+        //     meshDesc.triangles.data = &px_faces[0];
+        //     meshDesc.flags |= PxMeshFlag::e16_BIT_INDICES;
+        // }
+        // else
+        {
             for (size_t i = 0; i < faces.rows(); ++i) {
                 px_faces[i * 3] = faces(i, 0);
                 px_faces[i * 3 + 1] = faces(i, 1);
@@ -181,15 +181,29 @@ public:
             meshDesc.flags &= ~PxMeshFlag::e16_BIT_INDICES;
         }
 
-        PxDefaultMemoryOutputStream buf;
         PxTriangleMeshCookingResult::Enum result;
-        if (!Physics::get().cooking->cookTriangleMesh(meshDesc, buf, &result)) {
-            std::cout << "Cannot cook triangle mesh. Returning unit sphere instead. " << std::endl;
-            return Shape::from_geometry(PxSphereGeometry(1.), mat, is_exclusive);
+        PxTriangleMesh *mesh = NULL;
+        // Shape Flags
+        PxShapeFlags shape_flags = PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION;
+        if (false) {
+            PxDefaultMemoryOutputStream buf;
+            if (!Physics::get().cooking->cookTriangleMesh(meshDesc, buf, &result)) {
+                std::cout << "Cannot cook triangle mesh. Returning unit sphere instead. " << std::endl;
+                return Shape::from_geometry(PxSphereGeometry(1.), mat, is_exclusive, shape_flags);
+            }
+            PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+            mesh = Physics::get_physics()->createTriangleMesh(input);
         }
-        PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-        auto geom = PxTriangleMeshGeometry(Physics::get_physics()->createTriangleMesh(input), PxMeshScale(scale), PxMeshGeometryFlag::eDOUBLE_SIDED);
-        return Shape::from_geometry(geom, mat, is_exclusive);
+        else{
+            mesh = Physics::get().cooking->createTriangleMesh(meshDesc, Physics::get_physics()->getPhysicsInsertionCallback(), &result);
+            if (result != PxTriangleMeshCookingResult::eSUCCESS) {
+                std::cout << "Cannot cook triangle mesh. Returning unit sphere instead. " << std::endl;
+                return Shape::from_geometry(PxSphereGeometry(1.), mat, is_exclusive, shape_flags);
+            }
+        }
+        auto geom = PxTriangleMeshGeometry(mesh, PxMeshScale(scale), PxMeshGeometryFlag::eDOUBLE_SIDED);
+        Shape shape = Shape::from_geometry(geom, mat, is_exclusive, shape_flags);
+        return shape;
     }
 
 private:
@@ -297,7 +311,7 @@ private:
 
         PxTriangleMesh *mesh = geom.triangleMesh;
         const PxU32 nbPolys = mesh->getNbTriangles();
-        const PxU32 has16BitIndices = mesh->getTriangleMeshFlags() & PxTriangleMeshFlag::e16_BIT_INDICES;
+         const PxU32 has16BitIndices = mesh->getTriangleMeshFlags() & PxTriangleMeshFlag::e16_BIT_INDICES;
         const void *indices = mesh->getTriangles();
 
         const PxVec3 *verts = mesh->getVertices();

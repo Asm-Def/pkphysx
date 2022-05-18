@@ -9,7 +9,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from pyphysx_utils.transformations import *
-from pyphysx import *
+from pkphysx import *
 import quaternion as npq
 import sys
 

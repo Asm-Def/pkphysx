@@ -8,7 +8,7 @@ import numpy as np
 import unittest
 from trimesh.creation import uv_sphere
 
-from pyphysx import *
+from pkphysx import *
 from pyphysx_render.pyrender_base import PyRenderBase
 
 

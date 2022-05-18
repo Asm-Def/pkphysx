@@ -10,7 +10,7 @@ import sys
 
 sys.path.append('lib')
 
-from pyphysx import *
+from pkphysx import *
 import quaternion as npq
 
 

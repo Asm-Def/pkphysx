@@ -7,6 +7,7 @@
 import os
 import unittest
 from pyphysx_utils.urdf_robot_parser import *
+from pkphysx import *
 
 
 class UrdfParserTestCase(unittest.TestCase):

@@ -7,6 +7,7 @@
 import unittest
 from pyphysx_utils.tree_robot import *
 from pyphysx_utils.transformations import *
+from pkphysx import *
 import quaternion as npq
 
 

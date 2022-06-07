@@ -41,6 +41,7 @@ public:
 
     /** @brief Set number of CPU used for all scenes computation. */
     static void set_num_cpu(int num_cpu) {
+        //TODO: release old dispatcher
         Physics::get().dispatcher = physx::PxDefaultCpuDispatcherCreate(num_cpu);
     }
 

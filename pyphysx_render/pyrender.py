@@ -146,10 +146,14 @@ class PyPhysxViewer(PyRenderBase, Viewer):
 
     def on_key_press(self, symbol, modifiers):
         move_keys = {
-            pyglet.window.key.UP: np.array([-0.1, 0.0, 0.]),
-            pyglet.window.key.DOWN: np.array([0.1, 0.0, 0.]),
-            pyglet.window.key.LEFT: np.array([0.0, -0.1, 0.]),
-            pyglet.window.key.RIGHT: np.array([0.0, 0.1, 0.]),
+            # pyglet.window.key.UP: np.array([-0.1, 0.0, 0.]),
+            # pyglet.window.key.DOWN: np.array([0.1, 0.0, 0.]),
+            # pyglet.window.key.LEFT: np.array([0.0, -0.1, 0.]),
+            # pyglet.window.key.RIGHT: np.array([0.0, 0.1, 0.]),
+            pyglet.window.key.UP: np.array([-10, 0.0, 0.]),
+            pyglet.window.key.DOWN: np.array([10, 0.0, 0.]),
+            pyglet.window.key.LEFT: np.array([0.0, -10, 0.]),
+            pyglet.window.key.RIGHT: np.array([0.0, 10, 0.]),
         }
         if symbol in move_keys.keys():
             self._trackball.move_target(move_keys[symbol])

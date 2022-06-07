@@ -19,6 +19,11 @@ public:
         get_physx_ptr()->setConstraintFlag(physx::PxConstraintFlag::eENABLE_EXTENDED_LIMITS, true);
     }
 
+    D6Joint(RigidActor a1, const physx::PxTransform &local_pose0, const physx::PxTransform &local_pose1)
+            : BasePhysxPointer(physx::PxD6JointCreate(*Physics::get_physics(), nullptr, local_pose0, a1.get_physx_ptr(), local_pose1)) {
+        get_physx_ptr()->setConstraintFlag(physx::PxConstraintFlag::eENABLE_EXTENDED_LIMITS, true);
+    }
+
     void set_motion(physx::PxD6Axis::Enum axis, physx::PxD6Motion::Enum type) {
         get_physx_ptr()->setMotion(axis, type);
     }
@@ -124,6 +129,11 @@ public:
         physx::PxVec3 force, torque;
         get_physx_ptr()->getConstraint()->getForce(force, torque);
         return std::make_tuple(force, torque);
+    }
+
+    void set_kinemic_projection(bool flag, float tolerance=0.1f) {
+        get_physx_ptr()->setProjectionLinearTolerance(tolerance);
+        get_physx_ptr()->setConstraintFlag(physx::PxConstraintFlag::ePROJECTION, flag);
     }
 
 };

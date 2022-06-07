@@ -250,6 +250,19 @@ PYBIND11_MODULE(pkphysx, m) {
                  arg("global_pose") = physx::PxTransform(physx::PxIdentity),
                  arg("global_pose_other") = physx::PxTransform(physx::PxIdentity),
                  "Return true if two shapes overlaps."
+            )
+            .def("setup_simulation_filtering", &Shape::setup_simulation_filtering,
+               arg("filter_group"),
+               arg("filter_mask"),
+                 "Set filtering data for this shape."
+            )
+            .def("setup_query_filtering", &Shape::setup_query_filtering,
+               arg("filter_group"),
+               arg("filter_mask") = 0xFFFFFFFF,
+                 "Set filtering data for this shape."
+            )
+            .def("is_valid", &Shape::is_valid,
+                 "Return true if this shape is valid."
             );
 
     py::class_<RigidActor>(m, "RigidActor")
@@ -343,6 +356,11 @@ PYBIND11_MODULE(pkphysx, m) {
                  arg("local_pose0") = physx::PxTransform(physx::PxIdentity),
                  arg("local_pose1") = physx::PxTransform(physx::PxIdentity)
             )
+            .def(py::init<RigidActor, physx::PxTransform, physx::PxTransform>(),
+                     arg("actor1"),
+                     arg("local_pose0") = physx::PxTransform(physx::PxIdentity),
+                 arg("local_pose1") = physx::PxTransform(physx::PxIdentity)
+            )
             .def("set_motion", &D6Joint::set_motion,
                  arg("axis"),
                  arg("motion")
@@ -420,7 +438,10 @@ PYBIND11_MODULE(pkphysx, m) {
             .def("get_drive_velocity", &D6Joint::get_drive_velocity)
             .def("get_force_torque", &D6Joint::get_force_torque)
             .def("is_broken", &D6Joint::is_broken)
-            .def("release", &D6Joint::release);
+            .def("release", &D6Joint::release)
+            .def("set_kinemic_projection", &D6Joint::set_kinemic_projection,
+                 arg("flag") = true,
+                 arg("tolerance") = 0.1f);
 
 
     /***

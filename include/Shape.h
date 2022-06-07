@@ -107,6 +107,24 @@ public:
         );
     }
 
+    void setup_simulation_filtering(physx::PxU32 filterGroup, physx::PxU32 filterMask) {
+        physx::PxFilterData filterData;
+        filterData.word0 = filterGroup;
+        filterData.word1 = filterMask;
+        get_physx_ptr()->setSimulationFilterData(filterData);
+    }
+
+    void setup_query_filtering(physx::PxU32 filterGroup, physx::PxU32 filterMask) {
+        physx::PxFilterData filterData;
+        filterData.word0 = filterGroup;
+        filterData.word1 = filterMask;
+        get_physx_ptr()->setQueryFilterData(filterData);
+    }
+
+    bool is_valid() const {
+        return get_physx_ptr() != nullptr;
+    }
+
     static Shape create_box(const Eigen::Vector3f &sz, Material mat, bool is_exclusive) {
         return Shape::from_geometry(physx::PxBoxGeometry(0.5 * sz[0], 0.5 * sz[1], 0.5 * sz[2]), mat, is_exclusive);
     }

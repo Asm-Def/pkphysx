@@ -10,3 +10,4 @@ dist
 **/.eggs
 compile_commands.json
 .vscode
+*.pyd
